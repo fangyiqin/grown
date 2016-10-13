@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html ng-app="wsscat">
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style>
+		body,
+		html,
+		#map {
+			overflow: hidden;
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+		}
+		
+		#input1 {
+			position: absolute;
+			top: 20px;
+			z-index: 10;
+			width: 200px;
+			left: 50%;
+			margin-left: -100px;
+		}
+		
+		#input2 {
+			position: absolute;
+			top: 60px;
+			z-index: 10;
+			width: 200px;
+			left: 50%;
+			margin-left: -100px;
+		}
+		
+		#input3 {
+			position: absolute;
+			top: 100px;
+			z-index: 10;
+			width: 200px;
+			left: 50%;
+			margin-left: -100px;
+		}
+		
+		#input4 {
+			position: absolute;
+			top: 140px;
+			z-index: 10;
+			width: 200px;
+			left: 50%;
+			margin-left: -100px;
+		}
+	</style>
+
+	<body ng-controller="indexCtrl">
+		<div id="map"></div>
+		<!--onkeyup="search()"-->
+		<input id="input1" ng-model="input" ng-change="search()" placeholder="请输入你需要查找的地名" />
+		<input id="input2" ng-model="start" placeholder="请输入开始的地名" />
+		<input id="input3" ng-model="end" placeholder="请输入结束的地名" />
+		<button id="input4" ng-click="searchTran()">查询</button>
+	</body>
+	<script src="angular.js"></script>
+	<script src="http://api.map.baidu.com/api?v=2.0&ak=TCI6CBw4AtkGxqlfgKYFHWjsvPGpOAFa"></script>
+	<script>
+		var app = angular.module('wsscat', []);
+		app.controller('indexCtrl', function($scope) {
+			//console.log(navigator)
+		//getCurrentPosition HTML5获取定位信息的方法，接受两个函数，
+		//第一个成功的回调
+		//第二个失败的回调
+		//创建map的对象，对应的是id为map的div
+		var map = new BMap.Map('map');
+		//
+		map.centerAndZoom("广州", 14)
+			/*navigator.geolocation.getCurrentPosition(function(data){
+				console.log(data)
+				var r = {
+					point:{
+						lat:data.coords.latitude,
+						lng:data.coords.longitude
+					}
+				}
+				console.log(r)
+				var mk = new BMap.Marker(r.point);
+				map.addOverlay(mk);
+				map.panTo(r.point)
+			},function(error){
+				console.log(error)
+			})*/
+		var local = new BMap.LocalSearch(map, {
+			renderOptions: {
+				map: map
+			}
+		})
+		
+		var transit = new BMap.TransitRoute(map, {    
+ 			renderOptions: {map: map}    
+		});    
+		var geolocation = new BMap.Geolocation();
+		geolocation.getCurrentPosition(function(r) {
+			console.log(r)
+			var mk = new BMap.Marker(r.point);
+			map.addOverlay(mk);
+			map.panTo(r.point)
+			//local.search("银行")
+		}, function(error) {
+
+		})
+
+		function search() {
+			var input = document.getElementById('input').value;
+			console.log(input)
+			local.search(input)
+		}
+			//$scope.input = "公园"
+			$scope.search = function() {
+				//console.log($scope.input)
+				local.search($scope.input)
+			}
+			
+			$scope.searchTran = function(){
+				//$scope.start
+				//$scope.end
+				console.log("开始的地点"+$scope.start)
+				console.log("结束的地点"+$scope.end)
+				transit.search($scope.start, $scope.end);
+			}
+		})
+	</script>
+
+</html>
